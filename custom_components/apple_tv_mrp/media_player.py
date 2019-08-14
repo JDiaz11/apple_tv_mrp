@@ -106,7 +106,7 @@ class AppleTvDevice(MediaPlayerDevice):
     @property
     def unique_id(self):
         """Return a unique ID."""
-        return self.atv.metadata.device_id
+        return f"apple_tv_{self._host}"
 
     @property
     def should_poll(self):
