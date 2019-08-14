@@ -4,7 +4,7 @@ import logging
 import asyncio
 import plistlib
 
-from pyatv import exceptions
+from .. import exceptions
 
 
 _LOGGER = logging.getLogger(__name__)

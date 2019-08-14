@@ -1,7 +1,7 @@
 """Various helper methods."""
 
 import asyncio
-import pyatv
+import .
 
 
 def auto_connect(handler, timeout=5, not_found=None, event_loop=None):
