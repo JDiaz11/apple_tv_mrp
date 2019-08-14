@@ -21,7 +21,7 @@ SERVICE_AUTHENTICATE = "apple_tv_authenticate"
 ATTR_ATV = "atv"
 ATTR_POWER = "power"
 
-CONF_LOGIN_ID = "login_id"
+CONF_PORT = "port"
 CONF_START_OFF = "start_off"
 CONF_CREDENTIALS = "credentials"
 
@@ -56,7 +56,7 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Schema(
                     {
                         vol.Required(CONF_HOST): cv.string,
-                        vol.Required(CONF_LOGIN_ID): cv.string,
+                        vol.Required(CONF_PORT): cv.string,
                         vol.Optional(CONF_CREDENTIALS): cv.string,
                         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
                         vol.Optional(CONF_START_OFF, default=False): cv.boolean,
@@ -208,21 +208,22 @@ async def async_setup(hass, config):
 async def _setup_atv(hass, hass_config, atv_config):
     """Set up an Apple TV."""
     import .pyatv_mrp
+    from .pyatv3.conf import (AppleTV, MrpService)
 
     name = atv_config.get(CONF_NAME)
     host = atv_config.get(CONF_HOST)
-    login_id = atv_config.get(CONF_LOGIN_ID)
+    port = int(atv_config.get(CONF_PORT))
     start_off = atv_config.get(CONF_START_OFF)
     credentials = atv_config.get(CONF_CREDENTIALS)
 
     if host in hass.data[DATA_APPLE_TV]:
         return
 
-    details = pyatv_mrp.AppleTVDevice(name, host, login_id)
+    details = AppleTV(host, name)
+    details.add_service(MrpService(port, device_credentials=credentials))
+
     session = async_get_clientsession(hass)
     atv = pyatv_mrp.connect_to_apple_tv(details, hass.loop, session=session)
-    if credentials:
-        await atv.airplay.load_credentials(credentials)
 
     power = AppleTVPowerManager(hass, atv, start_off)
     hass.data[DATA_APPLE_TV][host] = {ATTR_ATV: atv, ATTR_POWER: power}
