@@ -1,5 +1,6 @@
 """Support for Apple TV media player."""
 import logging
+import asyncio
 
 from homeassistant.components.media_player import MediaPlayerDevice
 from homeassistant.components.media_player.const import (
@@ -59,7 +60,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     host = discovery_info[CONF_HOST]
     atv = hass.data[DATA_APPLE_TV][host][ATTR_ATV]
     power = hass.data[DATA_APPLE_TV][host][ATTR_POWER]
-    entity = AppleTvDevice(atv, name, power)
+    entity = AppleTvDevice(atv, name, power, host, hass.loop)
 
     @callback
     def on_hass_stop(event):
@@ -77,14 +78,21 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 class AppleTvDevice(MediaPlayerDevice):
     """Representation of an Apple TV device."""
 
-    def __init__(self, atv, name, power):
+    def __init__(self, atv, name, power, host, loop):
         """Initialize the Apple TV device."""
         self.atv = atv
         self._name = name
         self._playing = None
         self._power = power
         self._power.listeners.append(self)
+        self._host = host
+        self._loop = loop
         self.atv.push_updater.listener = self
+
+        asyncio.ensure_future(self.update_playing(), loop=self._loop)
+
+    async def update_playing(self):
+        self._playing = await self.atv.metadata.playing()
 
     async def async_added_to_hass(self):
         """Handle when an entity is about to be added to Home Assistant."""
@@ -222,6 +230,8 @@ class AppleTvDevice(MediaPlayerDevice):
     async def async_turn_on(self):
         """Turn the media player on."""
         self._power.set_power_on(True)
+
+        await update_playing()
 
     async def async_turn_off(self):
         """Turn the media player off."""
