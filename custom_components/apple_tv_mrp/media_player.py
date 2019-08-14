@@ -112,7 +112,7 @@ class AppleTvDevice(MediaPlayerDevice):
             return STATE_OFF
 
         if self._playing:
-            from pyatv import const
+            from .pyatv_mrp import const
 
             state = self._playing.play_state
             if state in (
@@ -155,7 +155,7 @@ class AppleTvDevice(MediaPlayerDevice):
     def media_content_type(self):
         """Content type of current playing media."""
         if self._playing:
-            from pyatv import const
+            from .pyatv_mrp import const
 
             media_type = self._playing.media_type
             if media_type == const.MEDIA_TYPE_VIDEO:

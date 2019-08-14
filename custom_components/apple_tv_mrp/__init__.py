@@ -80,7 +80,7 @@ def request_configuration(hass, config, atv, credentials):
 
     async def configuration_callback(callback_data):
         """Handle the submitted configuration."""
-        from pyatv import exceptions
+        from .pyatv_mrp import exceptions
 
         pin = callback_data.get("pin")
 
@@ -114,9 +114,9 @@ def request_configuration(hass, config, atv, credentials):
 
 async def scan_for_apple_tvs(hass):
     """Scan for devices and present a notification of the ones found."""
-    import pyatv
+    import .pyatv_mrp
 
-    atvs = await pyatv.scan_for_apple_tvs(hass.loop, timeout=3)
+    atvs = await pyatv_mrp.scan_for_apple_tvs(hass.loop, timeout=3)
 
     devices = []
     for atv in atvs:
@@ -207,7 +207,7 @@ async def async_setup(hass, config):
 
 async def _setup_atv(hass, hass_config, atv_config):
     """Set up an Apple TV."""
-    import pyatv
+    import .pyatv_mrp
 
     name = atv_config.get(CONF_NAME)
     host = atv_config.get(CONF_HOST)
@@ -218,9 +218,9 @@ async def _setup_atv(hass, hass_config, atv_config):
     if host in hass.data[DATA_APPLE_TV]:
         return
 
-    details = pyatv.AppleTVDevice(name, host, login_id)
+    details = pyatv_mrp.AppleTVDevice(name, host, login_id)
     session = async_get_clientsession(hass)
-    atv = pyatv.connect_to_apple_tv(details, hass.loop, session=session)
+    atv = pyatv_mrp.connect_to_apple_tv(details, hass.loop, session=session)
     if credentials:
         await atv.airplay.load_credentials(credentials)
 
