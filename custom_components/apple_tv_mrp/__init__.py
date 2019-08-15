@@ -114,9 +114,9 @@ def request_configuration(hass, config, atv, credentials):
 
 async def scan_for_apple_tvs(hass):
     """Scan for devices and present a notification of the ones found."""
-    import .pyatv_mrp
+    from .pyatv_mrp import scan_for_apple_tvs
 
-    atvs = await pyatv_mrp.scan_for_apple_tvs(hass.loop, timeout=3)
+    atvs = await scan_for_apple_tvs(hass.loop, timeout=3)
 
     devices = []
     for atv in atvs:
@@ -207,7 +207,8 @@ async def async_setup(hass, config):
 
 async def _setup_atv(hass, hass_config, atv_config):
     """Set up an Apple TV."""
-    import .pyatv_mrp
+    from .pyatv_mrp import connect_to_apple_tv
+    from .pyatv_mrp.const import PROTOCOL_MRP
     from .pyatv3.conf import (AppleTV, MrpService)
 
     name = atv_config.get(CONF_NAME)
@@ -223,7 +224,7 @@ async def _setup_atv(hass, hass_config, atv_config):
     details.add_service(MrpService(port, device_credentials=credentials))
 
     session = async_get_clientsession(hass)
-    atv = pyatv_mrp.connect_to_apple_tv(details, hass.loop, session=session)
+    atv = connect_to_apple_tv(details, hass.loop, protocol=PROTOCOL_MRP, session=session)
 
     power = AppleTVPowerManager(hass, atv, start_off)
     hass.data[DATA_APPLE_TV][host] = {ATTR_ATV: atv, ATTR_POWER: power}
