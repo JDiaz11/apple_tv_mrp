@@ -27,8 +27,8 @@ CONF_CREDENTIALS = "credentials"
 
 DEFAULT_NAME = "Apple TV"
 
-DATA_APPLE_TV = "data_apple_tv"
-DATA_ENTITIES = "data_apple_tv_entities"
+DATA_APPLE_TV = "data_apple_tv_mrp"
+DATA_ENTITIES = "data_apple_tv_mrp_entities"
 
 KEY_CONFIG = "apple_tv_configuring"
 
