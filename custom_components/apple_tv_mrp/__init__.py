@@ -13,7 +13,7 @@ import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-DOMAIN = "apple_tv"
+DOMAIN = "apple_tv_mrp"
 
 SERVICE_SCAN = "apple_tv_scan"
 SERVICE_AUTHENTICATE = "apple_tv_authenticate"
