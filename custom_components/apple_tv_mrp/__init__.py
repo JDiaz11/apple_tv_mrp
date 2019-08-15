@@ -15,8 +15,8 @@ _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "apple_tv_mrp"
 
-SERVICE_SCAN = "apple_tv_scan"
-SERVICE_AUTHENTICATE = "apple_tv_authenticate"
+SERVICE_SCAN = "apple_tv_mrp_scan"
+SERVICE_AUTHENTICATE = "apple_tv_mrp_authenticate"
 
 ATTR_ATV = "atv"
 ATTR_POWER = "power"
@@ -115,19 +115,18 @@ def request_configuration(hass, config, atv, credentials):
 async def scan_for_apple_tvs(hass):
     """Scan for devices and present a notification of the ones found."""
     from .pyatv_mrp import scan_for_apple_tvs
+    from .pyatv_mrp.const import PROTOCOL_MRP
 
     atvs = await scan_for_apple_tvs(hass.loop, timeout=3)
 
     devices = []
     for atv in atvs:
-        login_id = atv.login_id
-        if login_id is None:
-            login_id = "Home Sharing disabled"
-        devices.append(
-            "Name: {0}<br />Host: {1}<br />Login ID: {2}".format(
-                atv.name, atv.address, login_id
-            )
-        )
+        mrp_service = atv.get_service(PROTOCOL_MRP)
+
+        if mrp_service is None:
+            continue
+
+        devices.append(f"Name: {atv.name}<br/>Host: {atv.address}<br/>Port: {mrp_service.port}")
 
     if not devices:
         devices = ["No device(s) found"]
