@@ -209,7 +209,7 @@ async def _setup_atv(hass, hass_config, atv_config):
     """Set up an Apple TV."""
     from .pyatv_mrp import connect_to_apple_tv
     from .pyatv_mrp.const import PROTOCOL_MRP
-    from .pyatv3.conf import (AppleTV, MrpService)
+    from .pyatv_mrp.conf import (AppleTV, MrpService)
 
     name = atv_config.get(CONF_NAME)
     host = atv_config.get(CONF_HOST)
