@@ -14,17 +14,18 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     host = discovery_info[CONF_HOST]
     atv = hass.data[DATA_APPLE_TV][host][ATTR_ATV]
     power = hass.data[DATA_APPLE_TV][host][ATTR_POWER]
-    async_add_entities([AppleTVRemote(atv, power, name)])
+    async_add_entities([AppleTVRemote(atv, power, name, host)])
 
 
 class AppleTVRemote(remote.RemoteDevice):
     """Device that sends commands to an Apple TV."""
 
-    def __init__(self, atv, power, name):
+    def __init__(self, atv, power, name, host):
         """Initialize device."""
         self._atv = atv
         self._name = name
         self._power = power
+        self._host = host
         self._power.listeners.append(self)
 
     @property
@@ -35,7 +36,7 @@ class AppleTVRemote(remote.RemoteDevice):
     @property
     def unique_id(self):
         """Return a unique ID."""
-        return self._atv.metadata.device_id
+        return f"apple_tv_{self._host}"
 
     @property
     def is_on(self):
