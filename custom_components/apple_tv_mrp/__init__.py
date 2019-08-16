@@ -82,7 +82,7 @@ def request_pin(hass, config, atv):
         pin = callback_data.get("pin")
 
         try:
-            await atv.pairing.pin(pin)
+            atv.pairing.pin(pin)
             await atv.pairing.stop()
 
             if atv.pairing.has_paired:
