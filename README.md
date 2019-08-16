@@ -10,10 +10,12 @@ This is an update to the built-in Home Assistant Apple TV component which uses a
 
 You should be able to install this component as a custom component alongside the normal one using HACS or manually. The only difference in configuration is that the instead of login_id, port is now necessary. And the domain is apple_tv_mrp. So your config will look like this:
 
+```yaml
 apple_tv_mrp:
   - name: Bedroom Apple TV
     host: 10.0.0.6
     port: 49153
     credentials: credentials
+```
 
 Your credentials from the previous version will not work. You will need to re-authenticate using the apple_tv_mrp_authenticate service.
