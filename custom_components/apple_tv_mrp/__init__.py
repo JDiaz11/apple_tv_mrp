@@ -30,11 +30,11 @@ DEFAULT_NAME = "Apple TV"
 DATA_APPLE_TV = "data_apple_tv_mrp"
 DATA_ENTITIES = "data_apple_tv_mrp_entities"
 
-KEY_CONFIG = "apple_tv_configuring"
+KEY_CONFIG = "apple_tv_mrp_configuring"
 
-NOTIFICATION_AUTH_ID = "apple_tv_auth_notification"
+NOTIFICATION_AUTH_ID = "apple_tv_mrp_auth_notification"
 NOTIFICATION_AUTH_TITLE = "Apple TV Authentication"
-NOTIFICATION_SCAN_ID = "apple_tv_scan_notification"
+NOTIFICATION_SCAN_ID = "apple_tv_mrp_scan_notification"
 NOTIFICATION_SCAN_TITLE = "Apple TV Scan"
 
 T = TypeVar("T")  # pylint: disable=invalid-name
