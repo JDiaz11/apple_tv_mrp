@@ -73,35 +73,39 @@ APPLE_TV_SCAN_SCHEMA = vol.Schema({})
 
 APPLE_TV_AUTHENTICATE_SCHEMA = vol.Schema({ATTR_ENTITY_ID: cv.entity_ids})
 
-
-def request_configuration(hass, config, atv, credentials):
-    """Request configuration steps from the user."""
+def request_pin(hass, config, atv):
     configurator = hass.components.configurator
 
     async def configuration_callback(callback_data):
-        """Handle the submitted configuration."""
         from .pyatv_mrp import exceptions
 
         pin = callback_data.get("pin")
 
         try:
-            await atv.airplay.finish_authentication(pin)
-            hass.components.persistent_notification.async_create(
-                "Authentication succeeded!<br /><br />Add the following "
-                "to credentials: in your apple_tv configuration:<br /><br />"
-                "{0}".format(credentials),
-                title=NOTIFICATION_AUTH_TITLE,
-                notification_id=NOTIFICATION_AUTH_ID,
-            )
-        except exceptions.DeviceAuthenticationError as ex:
-            hass.components.persistent_notification.async_create(
-                "Authentication failed! Did you enter correct PIN?<br /><br />"
-                "Details: {0}".format(ex),
-                title=NOTIFICATION_AUTH_TITLE,
-                notification_id=NOTIFICATION_AUTH_ID,
-            )
+            await atv.pairing.pin(pin)
+            await atv.pairing.stop()
 
-        hass.async_add_job(configurator.request_done, instance)
+            if atv.pairing.has_paired:
+                hass.components.persistent_notification.async_create(
+                    f"Authentication succeeded!<br /><br />Add the following to credentials: in your apple_tv_mrp configuration:<br /><br/>{atv.pairing.credentials}",
+                    title=NOTIFICATION_AUTH_TITLE,
+                    notification_id=NOTIFICATION_AUTH_ID
+                )
+            else:
+                hass.components.persistent_notification.async_create(
+                    "Authentication failed!",
+                    title=NOTIFICATION_AUTH_TITLE,
+                    notification_id=NOTIFICATION_AUTH_ID
+                )
+
+            hass.async_add_job(configurator.request_done, instance)
+
+        except Exception as ex:
+            hass.components.persistent_notification.async_create(
+                f"Authentication failed!<br/>Message: {ex}", 
+                title=NOTIFICATION_AUTH_TITLE, 
+                notification_id=NOTIFICATION_AUTH_ID
+            )
 
     instance = configurator.request_config(
         "Apple TV Authentication",
@@ -110,7 +114,6 @@ def request_configuration(hass, config, atv, credentials):
         submit_caption="Confirm",
         fields=[{"id": "pin", "name": "PIN Code", "type": "password"}],
     )
-
 
 async def scan_for_apple_tvs(hass):
     """Scan for devices and present a notification of the ones found."""
@@ -145,31 +148,27 @@ async def async_setup(hass, config):
 
     async def async_service_handler(service):
         """Handle service calls."""
-        entity_ids = service.data.get(ATTR_ENTITY_ID)
 
         if service.service == SERVICE_SCAN:
             hass.async_add_job(scan_for_apple_tvs, hass)
             return
+        elif service.service == SERVICE_AUTHENTICATE:
+            entity_ids = service.data.get(ATTR_ENTITY_ID)
 
-        if entity_ids:
-            devices = [
-                device
-                for device in hass.data[DATA_ENTITIES]
-                if device.entity_id in entity_ids
-            ]
-        else:
-            devices = hass.data[DATA_ENTITIES]
+            if entity_ids:
+                devices = [
+                    device
+                    for device in hass.data[DATA_ENTITIES]
+                    if device.entity_id in entity_ids
+                ]
+            else:
+                devices = hass.data[DATA_ENTITIES]
 
         for device in devices:
-            if service.service != SERVICE_AUTHENTICATE:
-                continue
-
             atv = device.atv
-            credentials = await atv.airplay.generate_credentials()
-            await atv.airplay.load_credentials(credentials)
-            _LOGGER.debug("Generated new credentials: %s", credentials)
-            await atv.airplay.start_authentication()
-            hass.async_add_job(request_configuration, hass, config, atv, credentials)
+            await atv.pairing.start()
+
+            hass.async_add_job(request_pin, hass, config, atv)
 
     async def atv_discovered(service, info):
         """Set up an Apple TV that was auto discovered."""
