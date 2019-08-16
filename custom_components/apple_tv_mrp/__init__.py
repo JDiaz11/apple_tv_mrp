@@ -183,7 +183,7 @@ async def async_setup(hass, config):
             },
         )
 
-    discovery.async_listen(hass, SERVICE_APPLE_TV, atv_discovered)
+    #discovery.async_listen(hass, SERVICE_APPLE_TV, atv_discovered)
 
     tasks = [_setup_atv(hass, config, conf) for conf in config.get(DOMAIN, [])]
     if tasks:
