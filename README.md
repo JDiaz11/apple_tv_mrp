@@ -39,15 +39,15 @@ apple_tv_mrp:
 
 6. Run the `apple_tv_mrp.apple_tv_mrp_authenticate` service with the `entity_id` of the new `media_player` entity. Your Apple TV will show a PIN on it:
 
-[Apple TV PIN](https://i.imgur.com/Sbv8OvH.jpg)
+![Apple TV PIN](https://i.imgur.com/Sbv8OvH.jpg)
 
 7. Open the notification which is asking you to configure you Apple TV and enter the PIN
 
-[Enter PIN](https://i.imgur.com/UDvWrpB.png)
+![Enter PIN](https://i.imgur.com/UDvWrpB.png)
 
 8. You will get another notification that has the credentials. **Note: the text will be longer than the notification can display! It is four segments long, separated by colons. You must select all the text. Triple-clicking is normally sufficient**
 
-[Credential Notification](https://i.imgur.com/0fchhlj.png)
+![Credential Notification](https://i.imgur.com/0fchhlj.png)
 
 9. Add the credential to your config and restart Home Assistant.
 
