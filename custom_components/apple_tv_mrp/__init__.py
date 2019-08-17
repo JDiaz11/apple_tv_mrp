@@ -170,21 +170,6 @@ async def async_setup(hass, config):
 
             hass.async_add_job(request_pin, hass, config, atv)
 
-    async def atv_discovered(service, info):
-        """Set up an Apple TV that was auto discovered."""
-        await _setup_atv(
-            hass,
-            config,
-            {
-                CONF_NAME: info["name"],
-                CONF_HOST: info["host"],
-                CONF_LOGIN_ID: info["properties"]["hG"],
-                CONF_START_OFF: False,
-            },
-        )
-
-    #discovery.async_listen(hass, SERVICE_APPLE_TV, atv_discovered)
-
     tasks = [_setup_atv(hass, config, conf) for conf in config.get(DOMAIN, [])]
     if tasks:
         await asyncio.wait(tasks)
